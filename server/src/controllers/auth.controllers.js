@@ -59,10 +59,10 @@ exports.login = async (req, res, next) => {
 
     // Set token in cookie.
     const cookieOptions = {
-      // expires: new Date(
-      //   Date.now() +
-      //     process.env.JWT_AUTH_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-      // ),
+      expires: new Date(
+        Date.now() +
+          process.env.JWT_AUTH_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      ),
       httpOnly: true,
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https' // This is heroku specific
     };
@@ -139,15 +139,17 @@ exports.resetPassword = async (req, res, next) => {
     // Check if user exists
     const existingUser = await User.findOneAndUpdate(
       { email, passwordResetCode: code },
-      { password: newPassword }
-    );
-
+      { password: newPassword, passwordResetCode: '' }
+    ).exec();
     console.log(existingUser);
+
+    // If the user was not found, return an error message
+    if (!existingUser) return next(new AppError(400, 'Invalid credentials'));
 
     // Send response back to the user.
     res.json({
       status: true,
-      data: existingUser,
+      data: null,
       message:
         'Password reset successful. You can now login with your new password'
     });

@@ -78,8 +78,8 @@ app.post(
 );
 
 // REQUEST BODY PARSING
-app.use(express.json({ limit: '10kb' })); // This would limit the body size to 10kb
-app.use(express.urlencoded({ extended: true, limit: '10kb' })); // This would limit the body size to 10kb
+app.use(express.json({ limit: '5mb' })); // This would limit the body size to 10kb
+app.use(express.urlencoded({ extended: true, limit: '5mb' })); // This would limit the body size to 10kb
 app.use(cookieParser()); // Parses data from cookies
 
 // SECURITY - Data sanitization against NoSQL query injection

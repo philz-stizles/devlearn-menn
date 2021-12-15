@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const { Schema } = require('mongoose');
 const NAMESPACE = 'LESSON MODEL';
 
-const lessonSchema = new mongoose.Schema(
+const lessonSchema = new Schema(
   {
     title: {
       type: String,
@@ -19,6 +21,7 @@ const lessonSchema = new mongoose.Schema(
     },
     video: {},
     free_preview: {
+      // This option enables the instructor to specify if this course can be previewed for free.
       type: Boolean,
       default: false
     }

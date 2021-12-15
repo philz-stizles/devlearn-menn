@@ -1,9 +1,24 @@
 const express = require('express');
 
 const router = express.Router();
-const { create } = require('../../controllers/instructor.controllers');
-const { isAuthenticated } = require('../../middlewares/auth.middlewares');
+const {
+  createInstructor,
+  getCourses,
+  getCourse
+} = require('../../controllers/instructor.controllers');
+const {
+  isAuthenticated,
+  isAuthorized
+} = require('../../middlewares/auth.middlewares');
 
-router.post('/instructor', create);
+router.post('/instructor', isAuthenticated, createInstructor);
+
+router
+  .route('/instructor/courses')
+  .get(isAuthenticated, isAuthorized('instructor'), getCourses);
+
+router
+  .route('/instructor/courses/:slug')
+  .get(isAuthenticated, isAuthorized('instructor'), getCourse);
 
 module.exports = router;

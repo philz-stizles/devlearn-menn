@@ -56,6 +56,10 @@ const schema = new Schema(
       enum: ['subscriber', 'instructor', 'admin'],
       toLowerCase: true
     },
+    stripe_seller: {},
+    stripeSession: {},
+    stripe_account_id: '',
+    courses: [{ type: Types.ObjectId, ref: 'Course' }],
     tokens: [{ token: { type: String, required: true } }]
   },
   { timestamps: true }
@@ -102,7 +106,6 @@ schema.pre('save', async function (next) {
 
 schema.methods.comparePassword = async function (password) {
   const user = this;
-  console.log(password, user.password);
   try {
     return await validatePasswordAsync(password, user.password);
   } catch (error) {
@@ -158,7 +161,6 @@ schema.statics.findByAuthentication = async (email, password) => {
   }
 
   const isMatch = await user.comparePassword(password);
-  // console.log(isMatch)
   if (!isMatch) {
     throw new Error('Invalid Credentials');
   }
@@ -167,7 +169,6 @@ schema.statics.findByAuthentication = async (email, password) => {
 };
 
 schema.statics.exists = async (username, email) => {
-  console.log(username, email);
   // You can use arrow functions here as we will not be requiring
   // the 'this' reference
   return await User.findOne({
@@ -209,20 +210,19 @@ schema.methods.getPublicProfile = function () {
   return userObject;
 };
 
-// schema.methods.toJSON = function () {
-//   const user = this;
+schema.methods.toJSON = function () {
+  const user = this;
 
-//   // Create a JSON representation of the user
-//   const userObject = user.toObject();
+  // Create a JSON representation of the user
+  const userObject = user.toObject();
 
-//   // Remove private data
-//   delete userObject.password;
-//   delete userObject.tokens;
-//   delete userObject.avatar; // Remove avatar here coz the data is large for JSON requests
+  // Remove private data
+  delete userObject.password;
+  delete userObject.tokens;
 
-//   // Return public profile
-//   return userObject;
-// };
+  // Return public profile
+  return userObject;
+};
 
 // Create a Model.
 module.exports = User = model('User', schema);

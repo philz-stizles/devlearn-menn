@@ -1,25 +1,96 @@
 const express = require('express');
+const formidable = require('express-formidable');
 
 const router = express.Router();
 const {
-  register,
-  login,
-  logoutCookie,
-  forgotPassword,
-  resetPassword,
-  currentUser
-} = require('../../controllers/auth.controllers');
-const { isAuthenticated } = require('../../middlewares/auth.middlewares');
+  createCourse,
+  getCourses,
+  getCourse,
+  uploadImage,
+  removeImage,
+  uploadVideo,
+  removeVideo,
+  updateCourse,
+  publishCourse,
+  unPublishCourse,
+  addLesson,
+  removeLesson,
+  checkEnrollment,
+  freeEnrollment,
+  paidEnrollment
+} = require('../../controllers/course.controllers');
 const {
-  loginValidator,
-  signupValidator
-} = require('../../middlewares/validation.middlewares');
+  isAuthenticated,
+  isAuthorized
+} = require('../../middlewares/auth.middlewares');
 
-router.post('/auth/register', signupValidator, register);
-router.post('/auth/login', loginValidator, login);
-router.post('/auth/forgot-password', forgotPassword);
-router.post('/auth/reset-password', resetPassword);
-router.get('/auth/logout', logoutCookie);
-router.get('/auth/current-user', isAuthenticated, currentUser);
+router
+  .route('/courses')
+  .post(isAuthenticated, isAuthorized('instructor'), createCourse)
+  .get(getCourses);
+
+router.post('/courses/upload-image', uploadImage);
+router.post('/courses/remove-image', removeImage);
+
+router
+  .route('/courses/:slug')
+  .get(getCourse)
+  .put(isAuthenticated, isAuthorized('instructor'), updateCourse);
+
+router
+  .route('/courses/:slug/lessons')
+  .post(isAuthenticated, isAuthorized('instructor'), addLesson);
+
+router
+  .route('/courses/:slug/lessons/:lessonId')
+  .put(isAuthenticated, isAuthorized('instructor'), removeLesson);
+
+router.post(
+  // '/courses/upload-video/:instructorId',
+  '/courses/upload-video',
+  isAuthenticated,
+  isAuthorized('instructor'),
+  formidable(),
+  uploadVideo
+);
+router.post(
+  // '/courses/remove-video/:instructorId',
+  '/courses/remove-video',
+  isAuthenticated,
+  isAuthorized('instructor'),
+  removeVideo
+);
+
+router.put(
+  '/courses/:courseId/publish',
+  isAuthenticated,
+  isAuthorized('instructor'),
+  publishCourse
+);
+
+router.put(
+  '/courses/:courseId/un-publish',
+  isAuthenticated,
+  isAuthorized('instructor'),
+  unPublishCourse
+);
+
+router.get(
+  '/courses/:courseId/check-enrollment',
+  isAuthenticated,
+  checkEnrollment
+);
+
+router.post(
+  '/courses/:courseId/free-enrollment',
+  isAuthenticated,
+  freeEnrollment
+);
+
+router.post(
+  '/courses/:courseId/paid-enrollment',
+  isAuthenticated,
+  paidEnrollment
+);
 
 module.exports = router;

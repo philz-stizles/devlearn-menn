@@ -39,7 +39,7 @@ const schema = new Schema(
       default: true
     },
     instructor: {
-      type: ObjectId,
+      type: Types.ObjectId,
       ref: 'User',
       required: true
     },
@@ -49,7 +49,6 @@ const schema = new Schema(
 );
 
 schema.statics.exists = async title => {
-  console.log(username, email);
   // You can use arrow functions here as we will not be requiring
   // the 'this' reference
   return await Course.findOne({
